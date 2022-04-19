@@ -10,7 +10,9 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -41,6 +43,8 @@ public class covid19VirusDataService {
         System.out.println(httpResponse.body());
 
         // this code will will detect the header from the CSV file and remove it
+        Reader in = new FileReader("path/to/file.csv");
+
         Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
         for (CSVRecord record : records) {
             String id = record.get("ID");

@@ -5,6 +5,8 @@ package io.javabrains.covid19tracker;
  * Date: 19-04-2022
  */
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +39,14 @@ public class covid19VirusDataService {
        HttpResponse<String> httpResponse  =client.send(request, HttpResponse.BodyHandlers.ofString());
        // printing the data
         System.out.println(httpResponse.body());
+
+        // this code will will detect the header from the CSV file and remove it
+        Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+        for (CSVRecord record : records) {
+            String id = record.get("ID");
+            String customerNo = record.get("CustomerNo");
+            String name = record.get("Name");
+        }
 
     }
 }

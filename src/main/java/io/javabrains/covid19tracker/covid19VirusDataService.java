@@ -53,8 +53,10 @@ public class covid19VirusDataService {
         StringReader csvBodyReader = new StringReader(httpResponse.body());
         Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(csvBodyReader);
         for (CSVRecord record : records) {
-            String state = record.get("Province/State");
-            System.out.println(state);
+            LocationStats  locationStats = new LocationStats();
+            locationStats.setState(record.get("Province/State"));
+            locationStats.setCountry(record.get("Country/Region"));
+            locationStats.getLatestTotalCases(Integer.parseInt(record.get(record.size()-1)));
 
         }
 

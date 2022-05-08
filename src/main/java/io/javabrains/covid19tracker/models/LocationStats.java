@@ -4,10 +4,22 @@ package io.javabrains.covid19tracker.models;/*
  * Date: 19-04-2022
  */
 
+import org.springframework.web.bind.annotation.GetMapping;
+
 public class LocationStats {
-    private  String state;
-    private  String country;
+
+    private String state;
+    private String country;
     private int latestTotalCases;
+    private int DiffFromPrevDay;
+
+    public int getDiffFromPrevDay() {
+        return DiffFromPrevDay;
+    }
+
+    public void setDiffFromPrevDay(int DiffFromPrevDay) {
+        this.DiffFromPrevDay = DiffFromPrevDay;
+    }
 
     public String getState() {
         return state;
@@ -22,10 +34,11 @@ public class LocationStats {
     }
 
     public void setCountry(String country) {
+
         this.country = country;
     }
 
-    public int getLatestTotalCases(int i) {
+    public int getLatestTotalCases() {
         return latestTotalCases;
     }
 

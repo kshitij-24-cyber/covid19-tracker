@@ -11,6 +11,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.StringReader;
@@ -25,13 +26,16 @@ import java.util.List;
 @Service  // this is used to mark the method as a service
 
 public class covid19VirusDataService {
-     private  static  String VIRUS_DATA_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
     // method to fetch data from the file
 
     private List<LocationStats> allStats = new ArrayList<>();
 
+    public List<LocationStats> getAllStats() {
+        return allStats;
+    }
+
     @PostConstruct   // This is used to tell the spring that execute this method when the application start
-    @Scheduled(cron = "* * * * * * ")
+    @Scheduled(cron = "* * 1 * * * ")
     // this annotation is used when tha application has to be run on daily bases and has to be updated
     // this '*' -> shows second,minute,hour,day,month,year
 
@@ -42,6 +46,7 @@ public class covid19VirusDataService {
         // making request from the sever
         // covid-19 data CSV file
 
+        String VIRUS_DATA_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(VIRUS_DATA_URL))
                 .build();
@@ -51,14 +56,19 @@ public class covid19VirusDataService {
         // this code will  detect the header from the CSV file and remove it
         // StringReader is a instance of reader which parses string
         StringReader csvBodyReader = new StringReader(httpResponse.body());
-        Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(csvBodyReader);
+        Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvBodyReader);
         for (CSVRecord record : records) {
-            LocationStats  locationStats = new LocationStats();
-            locationStats.setState(record.get("Province/State"));
-            locationStats.setCountry(record.get("Country/Region"));
-            locationStats.getLatestTotalCases(Integer.parseInt(record.get(record.size()-1)));
-
+            LocationStats  locationStat = new LocationStats();
+            locationStat.setState(record.get("Province/State"));
+            locationStat.setCountry(record.get("Country/Region"));
+            int latestCases = Integer.parseInt(record.get(record.size()-1));
+            int prevDayCases = Integer.parseInt(record.get(record.size()-2));
+            locationStat.setLatestTotalCases(latestCases);
+            locationStat.setDiffFromPrevDay(latestCases-prevDayCases);
+            newStats.add(locationStat);
         }
 
+        this.allStats = newStats;
     }
-}
+
+     }

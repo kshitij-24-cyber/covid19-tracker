@@ -41,34 +41,23 @@ public class covid19VirusDataService {
 
     public void fetchVirusData() throws IOException, InterruptedException {
         List<LocationStats> newStats = new ArrayList<>();
-        // making the get method to get the data
         HttpClient client = HttpClient.newHttpClient();
-        // making request from the sever
-        // covid-19 data CSV file
-
-        String VIRUS_DATA_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(VIRUS_DATA_URL))
+                .uri(URI.create("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-20-2020.csv"))
                 .build();
-        // ofString -> take the body and just return as a string
         HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // this code will  detect the header from the CSV file and remove it
-        // StringReader is a instance of reader which parses string
         StringReader csvBodyReader = new StringReader(httpResponse.body());
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvBodyReader);
         for (CSVRecord record : records) {
-            LocationStats  locationStat = new LocationStats();
+            LocationStats locationStat = new LocationStats();
             locationStat.setState(record.get("Province/State"));
             locationStat.setCountry(record.get("Country/Region"));
-            int latestCases = Integer.parseInt(record.get(record.size()-1));
-            int prevDayCases = Integer.parseInt(record.get(record.size()-2));
-            locationStat.setLatestTotalCases(latestCases);
-            locationStat.setDiffFromPrevDay(latestCases-prevDayCases);
+            locationStat.setLatestTotalCases(Integer.parseInt(record.get("Confirmed")));
+            locationStat.setDiffFromPrevDay(Integer.parseInt(record.get("Difference from previous day")));
             newStats.add(locationStat);
         }
-
         this.allStats = newStats;
+
     }
 
      }

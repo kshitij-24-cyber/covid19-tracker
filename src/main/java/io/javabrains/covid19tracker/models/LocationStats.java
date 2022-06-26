@@ -14,6 +14,7 @@ public class LocationStats {
     private int DiffFromPrevDay;
 
     public int getDiffFromPrevDay() {
+
         return DiffFromPrevDay;
     }
 
